@@ -5,6 +5,8 @@ let showingQuestion = true;
 let interval;
 let posX = 100, posY = 100;
 let velX = 1.5, velY = 1.2;
+let manualStart = true;  // default: only start when Start is clicked
+
 
 window.onload = function () {
   const saved = JSON.parse(localStorage.getItem("qaList")) || [];
@@ -27,20 +29,15 @@ function saveQuestionAnswer() {
     questions.push(q);
     answers.push(a);
 
-    // Load existing QA list from localStorage
     let qaList = JSON.parse(localStorage.getItem("qaList")) || [];
-
-    // Add new entry
     qaList.push({ question: q, answer: a });
-
-    // Save updated list
     localStorage.setItem("qaList", JSON.stringify(qaList));
 
-    // Clear inputs
     document.getElementById("question").value = "";
     document.getElementById("answer").value = "";
 
-    if (!interval) startSequence();
+    // Only auto-start if manualStart is false
+    if (!interval && !manualStart) startSequence();
   } else {
     alert("Please enter both a question and an answer.");
   }
@@ -51,31 +48,28 @@ function startSequence() {
 
   if (interval) clearInterval(interval);
 
-    // 👇 Show first item immediately
-    showNext();
+  manualStart = false; // Allow auto-restart if user adds new Q&A
+showNext(); // Show first item immediately
 
-    // 👇 Then continue every 10 seconds
-    interval = setInterval(showNext, 10000);
-  
+interval = setInterval(() => {
+  const label = document.getElementById("label");
+  randomizeLabelShape();
 
-  interval = setInterval(() => {
-    const label = document.getElementById("label");
-    randomizeLabelShape();
+  if (showingQuestion) {
+    label.textContent = questions[index];
+    label.style.backgroundColor = getRandomColor();
+    label.style.color = "black";
+  } else {
+    label.textContent = answers[index];
+    label.style.backgroundColor = "#ffff99"; // Yellow for answers
+    label.style.color = "black";
+    index = (index + 1) % questions.length;
+  }
 
-    if (showingQuestion) {
-      label.textContent = questions[index];
-      label.style.backgroundColor = getRandomColor();
-      label.style.color = "black";
-    } else {
-      label.textContent = answers[index];
-      label.style.backgroundColor = "#ffff99"; // Yellow for answers
-      label.style.color = "black";
-      index = (index + 1) % questions.length;
-    }
-
-    showingQuestion = !showingQuestion;
-  }, 10000);
+  showingQuestion = !showingQuestion;
+}, 10000);
 }
+
 
 function showNext() {
   const label = document.getElementById("label");
@@ -95,12 +89,20 @@ function showNext() {
   showingQuestion = !showingQuestion;
 }
 
-
 function stopSequence() {
   clearInterval(interval);
   interval = null;
-}
+  manualStart = true; // Prevent auto-start from saving input
 
+  const label = document.getElementById("label");
+  label.textContent = "Press Start To Begin.";
+  label.style.backgroundColor = "#4caf50";
+  label.style.color = "black";
+  label.style.clipPath = "none";
+  label.style.borderRadius = "20px";
+  label.style.width = "300px";
+  label.style.height = "120px";
+}
 function updateLabelPosition() {
   const label = document.getElementById("label");
   const rect = label.getBoundingClientRect();
