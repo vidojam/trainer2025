@@ -1,326 +1,195 @@
-const label = document.getElementById("label");
-const qaContainer = document.getElementById("qaContainer");
-const addQA = document.getElementById("addQA");
-const saveQA = document.getElementById("saveQA");
-const startBtn = document.getElementById("startBtn");
-const inputSection = document.getElementById("inputSection");
-const stopBtn = document.getElementById("stopBtn");
-
-
-let qaList = [];
-let currentIndex = 0;
+let questions = [];
+let answers = [];
+let index = 0;
 let showingQuestion = true;
-let intervalId = null;
+let interval;
+let posX = 100, posY = 100;
+let velX = 1.5, velY = 1.2;
 
-label.textContent = "Press Start To Begin.";
+window.onload = function () {
+  const saved = JSON.parse(localStorage.getItem("qaList")) || [];
 
-
-// Load from localStorage
-function loadQA() {
-  const stored = localStorage.getItem("qaList");
-  qaList = stored ? JSON.parse(stored) : [];
-}
-
-// Save Q&A from input fields
-function saveQAList() {
-    qaList = [];
-    const pairs = qaContainer.querySelectorAll(".qa-pair");
-    pairs.forEach(pair => {
-      const qInput = pair.querySelector(".question");
-      const aInput = pair.querySelector(".answer");
-      const q = qInput.value.trim();
-      const a = aInput.value.trim();
-      if (q && a) {
-        qaList.push({ question: q, answer: a });
-      }
-    });
-  
-    localStorage.setItem("qaList", JSON.stringify(qaList));
-    currentIndex = 0;
-    showingQuestion = true;
-    updateLabel();
-    inputSection.style.display = "none"; // hide entry form
-  
-    startRotation(); // 🟢 Auto-start on save
-  }
-  
-  let posX = 100;
-  let posY = 100;
-  let velX = 1.5;
-  let velY = 1.5;
-  
-  function updateLabelPosition() {
-    const label = document.getElementById("label");
-    const rect = label.getBoundingClientRect();
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-  
-    posX += velX;
-    posY += velY;
-  
-    // Horizontal boundary
-    if (posX + rect.width >= winWidth) {
-      posX = winWidth - rect.width;
-      velX *= -1;
-    } else if (posX <= 0) {
-      posX = 0;
-      velX *= -1;
-    }
-  
-    // Vertical boundary
-    if (posY + rect.height >= winHeight) {
-      posY = winHeight - rect.height;
-      velY *= -1;
-    } else if (posY <= 0) {
-      posY = 0;
-      velY *= -1;
-    }
-  
-    label.style.left = posX + "px";
-    label.style.top = posY + "px";
-  }
-  
-  
-
-
-// Show question or answer alternately
-function updateLabel() {
-    if (qaList.length === 0) {
-      label.textContent = "Your question will appear here...";
-      label.style.backgroundColor = "#4caf50";
-      return;
-    }
-  
-    const current = qaList[currentIndex];
-  
-    if (showingQuestion) {
-      label.textContent = current.question;
-      label.style.backgroundColor = "#4caf50";
-    } else {
-      label.textContent = current.answer;
-      label.style.backgroundColor = "#ffeb3b";
-    }
-  
-    // ➕ Add this line to randomize shape every time
-    randomizeLabelShape();
-  
-    if (!showingQuestion) {
-      currentIndex = (currentIndex + 1) % qaList.length;
-    }
-  
-    showingQuestion = !showingQuestion;
-  }
-  
-
-    randomizeLabelShape(); // Call the function to randomize shape
-
-    function randomizeLabelShape() {
-      const shapes = ["rectangle", "square", "circle"];
-      const colors = ["#4caf50", "#2196f3", "#ff9800", "#e91e63", "#9c27b0", "#009688", "#ffc107"];
-      const chosenShape = shapes[Math.floor(Math.random() * shapes.length)];
-      const chosenColor = colors[Math.floor(Math.random() * colors.length)];
-      const complementaryColor = getComplementaryColor(chosenColor);
-
-      // Set label color
-      label.style.backgroundColor = chosenColor;
-
-      // Set background color of the screen
-      document.body.style.backgroundColor = complementaryColor;
-
-    
-      label.classList.remove("spin");
-      void label.offsetWidth;
-      label.classList.add("spin");
-    
-      label.style.backgroundColor = chosenColor;
-      label.style.borderRadius = "20px"; // Default rounded
-      label.style.width = "auto";
-      label.style.height = "auto";
-      label.style.padding = "20px 40px";
-      label.style.display = "inline-block";
-      label.style.justifyContent = "center";
-      label.style.alignItems = "center";
-    
-      if (chosenShape === "square") {
-        label.style.display = "flex";
-        label.style.padding = "20px";
-        label.style.width = "min-content";
-        label.style.height = "min-content";
-      }
-    
-      if (chosenShape === "circle") {
-        // Make it a big pill or full circle if possible
-        label.style.display = "inline-flex";
-        label.style.padding = "40px";
-        label.style.borderRadius = "50%";
-        label.style.minWidth = "180px";
-        label.style.minHeight = "180px";
-        label.style.width = "auto";
-        label.style.height = "auto";
-        label.style.flexDirection = "column";
-        label.style.alignItems = "center";
-        label.style.justifyContent = "center";
-        label.style.textAlign = "center";
-      }
-    }
-    
-    function getComplementaryColor(hex) {
-      // Remove "#" if present
-      hex = hex.replace("#", "");
-    
-      // Convert to RGB
-      const r = 255 - parseInt(hex.substring(0, 2), 16);
-      const g = 255 - parseInt(hex.substring(2, 4), 16);
-      const b = 255 - parseInt(hex.substring(4, 6), 16);
-    
-      // Convert back to hex
-      const compHex = "#" + [r, g, b]
-        .map(val => val.toString(16).padStart(2, '0'))
-        .join("");
-    
-      return compHex;
-    }
-    
-    
-    
-      
-
-// Add Q&A input fields
-addQA.onclick = () => {
-  const div = document.createElement("div");
-  div.className = "qa-pair";
-
-  const qInput = document.createElement("input");
-  qInput.className = "question";
-  qInput.placeholder = "Question";
-
-  const aInput = document.createElement("input");
-  aInput.className = "answer";
-  aInput.placeholder = "Answer";
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "X";
-  deleteBtn.onclick = () => div.remove();
-
-  div.appendChild(qInput);
-  div.appendChild(aInput);
-  div.appendChild(deleteBtn);
-  qaContainer.appendChild(div);
-};
-
-// Save Q&A to storage
-saveQA.onclick = () => {
-  saveQAList();
-  renderQA();
-};
-
-// Render saved Q&A for editing (if needed)
-function renderQA() {
-  qaContainer.innerHTML = "";
-  qaList.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "qa-pair";
-
-    const qInput = document.createElement("input");
-    qInput.className = "question";
-    qInput.value = item.question;
-
-    const aInput = document.createElement("input");
-    aInput.className = "answer";
-    aInput.value = item.answer;
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "X";
-    deleteBtn.onclick = () => {
-      qaList.splice(index, 1);
-      saveQAList();
-      renderQA();
-    };
-
-    div.appendChild(qInput);
-    div.appendChild(aInput);
-    div.appendChild(deleteBtn);
-    qaContainer.appendChild(div);
+  saved.forEach(item => {
+    questions.push(item.question);
+    answers.push(item.answer);
   });
+
+  const label = document.getElementById("label");
+  label.textContent = "Press Start To Begin.";
+  requestAnimationFrame(updateLabelPosition);
+};
+
+function saveQuestionAnswer() {
+  const q = document.getElementById("question").value.trim();
+  const a = document.getElementById("answer").value.trim();
+
+  if (q && a) {
+    questions.push(q);
+    answers.push(a);
+
+    // Load existing QA list from localStorage
+    let qaList = JSON.parse(localStorage.getItem("qaList")) || [];
+
+    // Add new entry
+    qaList.push({ question: q, answer: a });
+
+    // Save updated list
+    localStorage.setItem("qaList", JSON.stringify(qaList));
+
+    // Clear inputs
+    document.getElementById("question").value = "";
+    document.getElementById("answer").value = "";
+
+    if (!interval) startSequence();
+  } else {
+    alert("Please enter both a question and an answer.");
+  }
 }
 
+function startSequence() {
+  if (questions.length === 0 || answers.length === 0 || interval) return;
 
+  if (interval) clearInterval(interval);
+  
 
-// Bouncing label animation
-function startBouncingLabel() {
+  interval = setInterval(() => {
+    const label = document.getElementById("label");
+    randomizeLabelShape();
+
+    if (showingQuestion) {
+      label.textContent = questions[index];
+      label.style.backgroundColor = getRandomColor();
+      label.style.color = "black";
+    } else {
+      label.textContent = answers[index];
+      label.style.backgroundColor = "#ffff99"; // Yellow for answers
+      label.style.color = "black";
+      index = (index + 1) % questions.length;
+    }
+
+    showingQuestion = !showingQuestion;
+  }, 10000);
+}
+
+function stopSequence() {
+  clearInterval(interval);
+  interval = null;
+}
+
+function updateLabelPosition() {
   const label = document.getElementById("label");
-  label.textContent = "Press Start To Begin."; // 👈 Set initial label text
+  const rect = label.getBoundingClientRect();
+  const winWidth = window.innerWidth;
+  const winHeight = window.innerHeight;
+  const margin = 10;
 
-  let dx = 1.3, dy = 1.1;
+  posX += velX;
+  posY += velY;
 
-  function animate() {
-    const rect = label.getBoundingClientRect();
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-
-    x += dx;
-    y += dy;
-
-    if (x + rect.width >= winWidth || x <= 0) dx = -dx;
-    if (y + rect.height >= winHeight || y <= 0) dy = -dy;
-
-    label.style.left = `${x}px`;
-    label.style.top = `${y}px`;
-
-    requestAnimationFrame(animate);
+  if (posX + rect.width + margin >= winWidth) {
+    posX = winWidth - rect.width - margin;
+    velX *= -1;
+  } else if (posX <= margin) {
+    posX = margin;
+    velX *= -1;
   }
 
-  requestAnimationFrame(animate);
+  if (posY + rect.height + margin >= winHeight) {
+    posY = winHeight - rect.height - margin;
+    velY *= -1;
+  } else if (posY <= margin) {
+    posY = margin;
+    velY *= -1;
+  }
+
+  label.style.left = posX + "px";
+  label.style.top = posY + "px";
+
+  requestAnimationFrame(updateLabelPosition);
 }
 
-setInterval(updateLabelPosition, 20); // 🟢 Moves the label continuously
-
-
-// Start alternating Q & A every 10s
-function startRotation() {
-  if (intervalId) clearInterval(intervalId);
-  intervalId = setInterval(updateLabel, 10000);
+function getComplementaryColor(hex) {
+  hex = hex.replace("#", "");
+  const r = 255 - parseInt(hex.substring(0, 2), 16);
+  const g = 255 - parseInt(hex.substring(2, 4), 16);
+  const b = 255 - parseInt(hex.substring(4, 6), 16);
+  return "#" + [r, g, b].map(val => val.toString(16).padStart(2, '0')).join("");
 }
 
-stopBtn.onclick = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-      label.textContent = "Program stopped.";
-      label.style.backgroundColor = "#4caf50";
-    }
-  };
+function getRandomColor() {
+  const colors = ["#4caf50", "#2196f3", "#ff9800", "#e91e63", "#9c27b0", "#009688", "#ffc107"];
+  const chosenColor = colors[Math.floor(Math.random() * colors.length)];
+  const complementaryColor = getComplementaryColor(chosenColor);
+  document.body.style.backgroundColor = complementaryColor;
+  return chosenColor;
+}
 
-// Start button logic
-startBtn.onclick = () => {
-    if (qaList.length === 0) {
-      alert("Please save at least one question/answer pair first.");
-      return;
-    }
-  
-    if (intervalId) return; // already running
-  
-    updateLabel(); // show first question
-    startRotation(); // begin Q&A cycling
-  };
-  
+function randomizeLabelShape() {
+  const label = document.getElementById("label");
+  const shapes = ["rectangle", "square", "circle", "hexagon", "octagon", "star"];
+  const shape = shapes[Math.floor(Math.random() * shapes.length)];
 
-// Init
-loadQA();
-renderQA(); 
-updateLabel();
-startBouncingLabel();
+  label.style.transition = "all 0.5s ease-in-out";
+  label.style.borderRadius = "0";
+  label.style.clipPath = "none";
+  label.style.width = "auto";
+  label.style.height = "auto";
+  label.style.minWidth = "180px";
+  label.style.minHeight = "100px";
+  label.style.padding = "20px 30px";
+  label.style.display = "flex";
+  label.style.justifyContent = "center";
+  label.style.alignItems = "center";
+  label.style.textAlign = "center";
+  label.style.fontSize = "24px";
 
-stopBtn.onclick = () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-      label.textContent = "Program stopped.";
-      label.style.backgroundColor = "#4caf50";
-    }
-  };
+  switch (shape) {
+    case "circle":
+      label.style.borderRadius = "50%";
+      label.style.width = "180px";
+      label.style.height = "180px";
+      break;
+    case "square":
+      label.style.borderRadius = "20px";
+      label.style.width = "180px";
+      label.style.height = "180px";
+      break;
+    case "rectangle":
+      label.style.borderRadius = "20px";
+      label.style.width = "300px";
+      label.style.height = "120px";
+      break;
+      case "hexagon":
+        label.style.clipPath = "polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)";
+        label.style.width = "220px";
+        label.style.height = "180px";
+        break;
+      case "octagon":
+        label.style.clipPath = "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)";
+        label.style.width = "220px";
+        label.style.height = "180px";
+        break;
+      case "star":
+        label.style.clipPath = "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)";
+        label.style.width = "220px";
+        label.style.height = "220px";
+        break;
+  }
+}
 
-  // Removed duplicate randomizeLabelShape function
+function clearAll() {
+  if (confirm("Are you sure you want to delete all questions and answers?")) {
+    localStorage.removeItem("qaList");
+    questions = [];
+    answers = [];
+    index = 0;
+    showingQuestion = true;
+    stopSequence();
+    document.getElementById("label").textContent = "All data cleared. Press Start To Begin.";
+  }
+}
+
+
   
   
 

@@ -7,17 +7,40 @@
 </head>
 <body>
 
-  <div id="label">Your question will appear here...</div>
+  <div id="label">Press Start To Begin.</div>
 
   <div id="inputSection">
-    <div id="qaContainer"></div>
-    <button id="addQA">Add Question</button>
-    <button id="saveQA">Save Answers</button>
-    <button id="startBtn">Start</button>
-    <button id="stopBtn">Stop</button>
+    <!-- Question & Answer Inputs -->
+    <input id="question" type="text" placeholder="Enter question" style="width: 300px; padding: 10px; margin: 5px;" />
+    <input id="answer" type="text" placeholder="Enter answer" style="width: 300px; padding: 10px; margin: 5px;" />
+
+    <!-- Buttons -->
+    <br />
+    <button onclick="saveQuestionAnswer()">Add Question & Answer</button>
+    <button onclick="startSequence()">Start</button>
+    <button onclick="stopSequence()">Stop</button>
+    <button onclick="clearAll()">Clear All</button>
   </div>
 
   <script src="script.js"></script>
+
+  <!-- 🟨 Load saved Q&A from localStorage on page load -->
+  <script>
+    window.onload = function () {
+      const saved = JSON.parse(localStorage.getItem("qaList")) || [];
+
+      saved.forEach(item => {
+        if (item.question && item.answer) {
+          questions.push(item.question);
+          answers.push(item.answer);
+        }
+      });
+
+      document.getElementById("label").textContent = "Press Start To Begin.";
+      requestAnimationFrame(updateLabelPosition);
+    };
+  </script>
 </body>
 </html>
+
 
