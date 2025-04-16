@@ -130,5 +130,20 @@ body {
     border-radius: 8px;
     border: 1px solid #ccc;
   }
+
+  button {
+    font-size: 1.25em;          /* 25% larger */
+    padding: 12px 24px;         /* Slightly larger padding */
+    margin: 10px;
+    border-radius: 12px;        /* Rounded edges */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #f0f0f0;
+  }
+  
   
   

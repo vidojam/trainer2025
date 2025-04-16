@@ -50,6 +50,12 @@ function startSequence() {
   if (questions.length === 0 || answers.length === 0 || interval) return;
 
   if (interval) clearInterval(interval);
+
+    // 👇 Show first item immediately
+    showNext();
+
+    // 👇 Then continue every 10 seconds
+    interval = setInterval(showNext, 10000);
   
 
   interval = setInterval(() => {
@@ -70,6 +76,25 @@ function startSequence() {
     showingQuestion = !showingQuestion;
   }, 10000);
 }
+
+function showNext() {
+  const label = document.getElementById("label");
+  randomizeLabelShape();
+
+  if (showingQuestion) {
+    label.textContent = questions[index];
+    label.style.backgroundColor = getRandomColor();
+    label.style.color = "black";
+  } else {
+    label.textContent = answers[index];
+    label.style.backgroundColor = "#ffff99"; // Yellow for answers
+    label.style.color = "black";
+    index = (index + 1) % questions.length;
+  }
+
+  showingQuestion = !showingQuestion;
+}
+
 
 function stopSequence() {
   clearInterval(interval);
