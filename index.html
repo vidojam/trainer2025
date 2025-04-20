@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" type="image/png">
+<meta name="theme-color" content="#2196f3" />
   <title>Bouncing Q&A Label</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
 
   <div id="label">Press Start To Begin.</div>
 
@@ -40,6 +44,12 @@
       document.getElementById("label").textContent = "Press Start To Begin.";
       requestAnimationFrame(updateLabelPosition);
     };
+
+    if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(reg => console.log("✅ Service Worker registered"))
+      .catch(err => console.error("Service Worker error:", err));
+    }
   </script>
 </body>
 </html>
