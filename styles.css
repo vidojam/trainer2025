@@ -35,13 +35,14 @@ body {
   
   /* 🌀 Spin Animation */
   .spin {
-    animation: spin 0.6s linear;
+    animation: spin 0.8s linear;
   }
   
   @keyframes spin {
-    from { transform: rotate(0deg) translate(-50%, -50%); }
-    to { transform: rotate(360deg) translate(-50%, -50%); }
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
   }
+  
   
   #inputSection {
     position: absolute;

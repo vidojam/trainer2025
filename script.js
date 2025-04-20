@@ -133,6 +133,14 @@ function updateLabelPosition() {
   label.style.top = posY + "px";
 
   requestAnimationFrame(updateLabelPosition);
+
+  if (Math.random() < 0.003) {  // about 0.3% chance per frame (~every few seconds)
+    const label = document.getElementById("label");
+    if (!label.classList.contains("spin")) {
+      label.classList.add("spin");
+      setTimeout(() => label.classList.remove("spin"), 600);
+    }
+  }
 }
 
 function getComplementaryColor(hex) {
@@ -152,10 +160,12 @@ function getRandomColor() {
 }
 
 function randomizeLabelShape() {
+
   const label = document.getElementById("label");
   const shapes = ["rectangle", "square", "circle", "hexagon", "octagon", "star"];
   const shape = shapes[Math.floor(Math.random() * shapes.length)];
-
+  label.classList.add("spin");
+  setTimeout(() => label.classList.remove("spin"), 600);
   label.style.transition = "all 0.5s ease-in-out";
   label.style.borderRadius = "0";
   label.style.clipPath = "none";
@@ -173,13 +183,13 @@ function randomizeLabelShape() {
   switch (shape) {
     case "circle":
       label.style.borderRadius = "50%";
-      label.style.width = "180px";
-      label.style.height = "180px";
+      label.style.width = "240px";
+      label.style.height = "240px";
       break;
     case "square":
       label.style.borderRadius = "20px";
-      label.style.width = "180px";
-      label.style.height = "180px";
+      label.style.width = "240px";
+      label.style.height = "240px";
       break;
     case "rectangle":
       label.style.borderRadius = "20px";
@@ -197,9 +207,9 @@ function randomizeLabelShape() {
         label.style.height = "180px";
         break;
       case "star":
-        label.style.clipPath = "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)";
-        label.style.width = "220px";
-        label.style.height = "220px";
+        label.style.clipPath = "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"; 
+        label.style.width = "400px";
+        label.style.height = "400px";
         break;
   }
 }
