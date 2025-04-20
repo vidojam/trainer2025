@@ -16,6 +16,17 @@ window.onload = function () {
     answers.push(item.answer);
   });
 
+  setTimeout(() => {
+    const label = document.getElementById("label");
+    // Start centered, based on current zoom
+    posX = (window.innerWidth - label.offsetWidth) / 2;
+    posY = (window.innerHeight - label.offsetHeight) / 2;
+    label.style.left = posX + "px";
+    label.style.top = posY + "px";
+
+    requestAnimationFrame(updateLabelPosition);
+  }, 0);
+
   const label = document.getElementById("label");
   label.textContent = "Press Start To Begin.";
   requestAnimationFrame(updateLabelPosition);
@@ -93,7 +104,6 @@ function stopSequence() {
   clearInterval(interval);
   interval = null;
   manualStart = true; // Prevent auto-start from saving input
-
   const label = document.getElementById("label");
   label.textContent = "Press Start To Begin.";
   label.style.backgroundColor = "#4caf50";
@@ -225,6 +235,13 @@ function clearAll() {
     document.getElementById("label").textContent = "All data cleared. Press Start To Begin.";
   }
 }
+
+window.addEventListener('resize', () => {
+  const label = document.getElementById("label");
+  // Optional: Keep label inside new bounds
+  posX = Math.min(posX, window.innerWidth - label.offsetWidth - 10);
+  posY = Math.min(posY, window.innerHeight - label.offsetHeight - 10);
+});
 
 
   

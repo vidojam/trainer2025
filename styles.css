@@ -15,7 +15,7 @@ body {
     color: black;
     position: absolute;
     padding: 20px 40px;
-    transform: translate(-50%, -50%);
+    /* transform: translate(-50%, -50%); */
     font-size: 48px;
     font-family: sans-serif;
     text-align: center;
